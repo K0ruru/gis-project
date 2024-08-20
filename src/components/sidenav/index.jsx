@@ -1,20 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./sidenav.scss";
 
 export default function SideNav() {
 	const [collapsed, setCollapsed] = useState(false);
+	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
 	const toggleCollapse = () => {
 		setCollapsed(!collapsed);
 	};
 
+	// Detect window resize to handle mobile/desktop switch
+	useEffect(() => {
+		const handleResize = () => {
+			setIsMobile(window.innerWidth <= 768);
+		};
+
+		window.addEventListener("resize", handleResize);
+		return () => window.removeEventListener("resize", handleResize);
+	}, []);
+
 	return (
 		<div className={`sidenav ${collapsed ? "collapsed" : ""}`}>
-			<div className="sidenav-header">
-				<div className="logo" onClick={toggleCollapse}>
-					<i className="fas fa-globe"></i>
+			{/* Header is only visible on desktop */}
+			{!isMobile && (
+				<div className="sidenav-header">
+					<div className="logo" onClick={toggleCollapse}>
+						<i className="fas fa-globe"></i>
+					</div>
 				</div>
-			</div>
+			)}
+
+			{/* Content is inside a collapsible area for mobile */}
 			<div className="sidenav-content">
 				<input type="text" placeholder="Search a place..." />
 				<h2>Places near you</h2>
@@ -51,6 +67,15 @@ export default function SideNav() {
 					<div className="place-image">{/* Placeholder for the image */}</div>
 				</div>
 			</div>
+
+			{/* Footer is only visible on mobile */}
+			{isMobile && (
+				<div className="sidenav-footer" onClick={toggleCollapse}>
+					<div className="logo">
+						<i className="fas fa-globe"></i>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
